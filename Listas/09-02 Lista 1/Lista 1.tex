@@ -1,0 +1,496 @@
+% #region imports
+\documentclass[10pt, twoside]{article}          % document type
+\usepackage[brazil]{babel}                      % portuguese support
+\usepackage[utf8]{inputenc}                     % almost every symbol
+\usepackage[T1]{fontenc}                        % font support
+
+\PassOptionsToPackage{table}{xcolor}            % table colors
+
+\usepackage{amsmath}                            % math enhancements
+\usepackage{amssymb}                            % math symbols
+\usepackage{amsthm}                             % math proof
+\usepackage{bera}                               % mono font
+\usepackage{booktabs}                           % figure tables
+\usepackage{cancel}                             % math cancel
+\usepackage{color}                              % page and text color
+\usepackage{dsfont}                             % indicator function
+\usepackage{enumitem}                           % list settings
+\usepackage{etoolbox}                           % bordermatrix patch
+\usepackage{float}                              % figure here
+\usepackage{fourier}                            % more readable math
+\usepackage{gensymb}                            % math degree
+\usepackage{geometry}                           % page settings
+\usepackage{graphicx}                           % images
+\usepackage{helvet}                             % Arial font
+\usepackage{hyperref}                           % links
+\usepackage{listings}                           % code environment
+\usepackage{mathtools}                          % mathclap
+\usepackage{multicol}                           % page columns
+% \usepackage{newtxmath}                          % more readable math
+\usepackage{nicefrac}                           % nicefrac horizontal fraction
+\usepackage{pifont}                             % correct and wrong symbols
+\usepackage[fontsize=8pt]{scrextend}            % global font size
+\usepackage{tabto}                              % tabto positioning
+\usepackage{textcomp}                           % text leaf
+\usepackage{tikz}                               % graphics
+% \usepackage[table]{xcolor}                      % table colors (option clash)
+\usepackage{xcolor}                             % html colors
+% #endregion
+
+% #region settings
+
+\DeclareSymbolFont{AMSb}{U}{msb}{m}{n}
+\makeatletter
+\DeclareSymbolFontAlphabet{\math@bb}{AMSb}
+\AtBeginDocument{\protected\def\mathbb{\math@bb}} 
+\makeatother
+
+\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
+
+\DeclareMathAlphabet{\mathfrak}{U}{jkpmia}{m}{it}
+\SetMathAlphabet{\mathfrak}{bold}{U}{jkpmia}{bx}{it}
+
+
+\usetikzlibrary{arrows, positioning, shapes}    % state diagram
+
+\geometry{                                      % page settings
+  papersize={216mm,279mm},  landscape,
+  top=1.525cm,  outer=1.125cm,  bottom=1.125cm, inner=1.225cm,
+  includefoot,  footskip=0.5cm
+}
+
+\geometry{papersize={210mm,297mm}}              % A4 paper
+
+% \pagecolor{black}                               % page background color
+% \color{white}                                   % text default color
+
+\renewcommand{\familydefault}{\sfdefault}       % Arial font
+
+\lstset{
+  literate=
+  {á}{{\'a}}1 {à}{{\à}}1 {ã}{{\~a}}1
+  {é}{{\'e}}1 {ê}{{\^e}}1
+  {í}{{\'i}}1
+  {ó}{{\'o}}1 {õ}{{\~o}}1
+  {ú}{{\'u}}1 {ü}{{\"u}}1
+  {ç}{{\c{c}}}1
+}                                               % accents in code
+
+% \delimitershortfall=-1pt                        % bigger wrapping brackets
+\delimitershortfall=1pt                         % average wrapping brackets
+\def\dis{\displaystyle}                         % big inline math
+
+\makeatletter
+
+  \def\resetMathstrut@{%                        % default \left and \right in math mode (1/2)
+    \setbox\z@\hbox{%
+      \mathchardef\@tempa\mathcode`\[\relax
+      \def\@tempb##1"##2##3{\the\textfont"##3\char"}%
+      \expandafter\@tempb\meaning\@tempa \relax
+    }%
+    \ht\Mathstrutbox@\ht\z@ \dp\Mathstrutbox@\dp\z@}
+  \mathchardef\@tempa\mathcode`\]\relax
+
+  \def\cantox@vector#1#2#3#4#5#6#7#8{%
+    \dimen@.5\p@
+    \setbox\z@\vbox{\boxmaxdepth.5\p@
+    \hbox{\kern-1.2\p@\kern#1\dimen@$#7{#8}\m@th$}}%
+    \ifx\canto@fil\hidewidth  \wd\z@\z@ \else \kern-#6\unitlength \fi
+    \ooalign{%
+      \canto@fil$\m@th \CancelColor
+      \vcenter{\hbox{\dimen@#6\unitlength \kern\dimen@
+        \multiply\dimen@#4\divide\dimen@#3 \vrule\@depth\dimen@\@width\z@
+        \vector(#3,-#4){#5}%
+      }}_{\raise-#2\dimen@\copy\z@\kern-\scriptspace}$%
+      \canto@fil \cr
+      \hfil \box\@tempboxa \kern\wd\z@ \hfil \cr}}
+  \def\bcancelto#1#2{\let\canto@vector\cantox@vector\cancelto{#1}{#2}}
+
+  \newlength{\normalparindent}
+  \AtBeginDocument{\setlength{\normalparindent}{\parindent}}
+\makeatother
+
+\let\oldphantom\vphantom
+\let\vphantom\relax
+\begingroup                                     % default \left and \right in math mode (1/2)
+  \catcode`(\active \xdef({\mathopen{}\left\string(\vphantom{1j}}
+  \catcode`)\active \xdef){\right\string)\mathclose{}}
+\endgroup
+\mathcode`(="8000 \mathcode`)="8000
+\let\vphantom\oldphantom
+
+\DeclareMathSymbol{*}{\mathbin}{symbols}{"01}   % default \cdot in math mode
+% #endregion
+
+% #region commands
+\newcommand*\diff{\mathop{}\!\mathrm{d}}        % differential d
+
+\DeclareMathOperator{\dom}{dom}                 % dom function
+\DeclareMathOperator{\img}{img}                 % img function
+\DeclareMathOperator{\mdc}{mdc}                 % mdc function
+\DeclareMathOperator{\adj}{adj}                 % adj function
+\DeclareMathOperator{\proj}{proj}               % projection function
+
+\newcommand{\Reals}{\mathds{R}}                 % Reals set
+\newcommand{\Ints}{\mathds{Z}}                  % Integers set
+\newcommand{\Nats}{\mathds{N}}                  % Naturals set
+\newcommand{\Rats}{\mathds{Q}}                  % Rationals set
+\newcommand{\Irats}{\mathds{I}}                 % Irrationals set
+\newcommand{\Primes}{\mathds{P}}                % Primes set
+\newcommand{\ind}{\mathds{1}}                   % indicator function
+
+\newcommand{\given}{\,\middle|\,}               % conditional probability
+
+\renewcommand{\complement}{\mathsf{c}}          % set complement
+
+\DeclareRobustCommand{\Omicron}{%
+  \text{\small\usefont{OMS}{cmsy}{m}{n}O}%
+}                                               % big omicron
+\DeclareRobustCommand{\omicron}{%
+  \text{\small\usefont{OMS}{cmsy}{m}{n}o}%
+}                                               % small omicron
+
+\newcommand{\bigO}{\Omicron}                    % big O
+\newcommand{\smallo}{\omicron}                  % small o
+
+\newcommand{\defeq}{\vcentcolon=}               % definition
+\newcommand{\eqdef}{=\vcentcolon}               % reverse definition
+
+\newcommand{\cmark}{\ding{51}}                  % correct symbol
+\newcommand{\xmark}{\ding{55}}                  % wrong symbol
+\newcommand{\cross}{\ding{61}}                  % amortized symbol
+
+\renewcommand{\deg}{\!\degree\:}                % math degree
+
+\renewcommand{\binom}[2]{\l({{#1}\atop#2}\r)}   % combinations
+
+\DeclareRobustCommand{\Chi}
+  {{\mathpalette\irchi\relax}}
+\newcommand{\irchi}[2]
+  {\raisebox{\depth}{$#1\chi$}}                 % uppercase chi
+
+\newcommand{\overtext}[2]
+  {\overset{\mathclap{\text{#1}}}{#2}}          % text over
+\newcommand{\undertext}[2]
+  {\underset{\mathclap{\text{#1}}}{#2}}         % text under
+\newcommand{\overmath}[2]
+  {\overset{\mathclap{#1}}{#2}}                 % math over
+\newcommand{\undermath}[2]
+  {\underset{\mathclap{#1}}{#2}}                % math under
+\newcommand{\canceltext}[2]
+  {\smash{\overtext{#1}{\cancel{#2}}}}          % text cancel
+
+\newcommand{\vghost}[1]{{%                      % artificial math size
+  \delimitershortfall=-1pt
+  \vphantom{
+    \begingroup
+    \lccode`m=`(\relax
+    \lowercase\expandafter{\romannumeral#1000}%
+    \lccode`m=`)\relax
+    \lowercase\expandafter{\romannumeral#1000}%
+    \endgroup
+  }
+}}
+
+\renewcommand{\l}{\mathopen{}\left}             % \left alias
+\renewcommand{\r}{\vphantom{1j}\right}          % \right alias
+% \newcommand{\ls}[1]
+%   {\mathopen{}\noexpand\begingroup\left#1}      % \left alias
+% \newcommand{\rs}[1]
+%   {\vphantom{1j}\endgroup\right#1}              % \right alias
+
+\let\oldtextleaf\textleaf
+\renewcommand{\textleaf}
+  {{\fontfamily{cmr}\selectfont \oldtextleaf}}  % textleaf
+
+\renewcommand{\qed}{\hfill$\blacksquare$}       % Black-filled qed
+
+\newcommand{\x}[1]{\discretionary{#1}{#1}{#1}}  % correct hyphenation
+\newcommand{\y}{\hspace{0pt}}                   % breackable non-space    
+
+\newcommand{\triple}[4]{%
+  \parbox{.333#4}{#1\hfill}%
+  \parbox{.333#4}{\hfil#2\hfil}%
+  \parbox{.333#4}{\hfill#3}%
+}                                               % triple align
+% #endregion
+
+% #region customizations
+\newenvironment{proof*}[1][proof*]              % better proof environment
+  {\proof[#1]\vspace{0.5em}\vspace*{-\baselineskip}
+  \hspace{\parindent}\leftskip=.5cm\rightskip=.5cm}
+  % {\vspace*{-0.5\baselineskip}\rightskip=0cm\endproof}
+  {\vspace*{-1.5\baselineskip}
+  
+  \rightskip=0cm\endproof}
+
+% \let\bbordermatrix\bordermatrix
+\patchcmd{\bordermatrix}{8.75}{4.75}{}{}
+\patchcmd{\bordermatrix}{\left(}{\left[}{}{}    % bordermatrix with angular brackets (left)
+\patchcmd{\bordermatrix}{\right)}{\right]}{}{}  % bordermatrix with angular brackets (right)
+\patchcmd{\bordermatrix}
+  {\begingroup}{\begingroup\openup1\jot}{}{}    % bordermatrix col height
+
+\hypersetup{
+  colorlinks,
+  linkcolor={red!50!black},
+  citecolor={blue!50!black},
+  urlcolor={blue!80!black}
+}
+
+\lstset{
+  basicstyle=\ttfamily,
+  escapeinside={||},
+  mathescape=true,
+  extendedchars=true,
+  inputencoding=utf8
+}                                               % styles in listings
+
+\DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{8}     % for bold monofont
+\DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{8}      % for normal monfont
+
+% \definecolor{deepblue}{rgb}{0,0,0.5}
+\newcommand{\pythonstyle}{\lstset{              % python code style
+  xleftmargin=\dimexpr.5cm+\parindent\relax,
+  language=Python,
+  % basicstyle=\ttm,
+  otherkeywords={self},
+  % keywordstyle=\ttb\color{purple},
+  keywordstyle={\bfseries},
+  % emph={MyClass,__init__},
+  % emphstyle=\ttb\color{deepred},
+  % stringstyle=\color{deepgreen},
+  % frame=tb,
+  showstringspaces=false
+}}
+
+\lstnewenvironment{python}[1][]
+  {\pythonstyle\lstset{#1}}{}                   % python environment
+
+\newcommand\pythonexternal[2][]
+  {{\pythonstyle\lstinputlisting[#1]{#2}}}      % external python code
+
+\newcommand\pythoninline[1]
+  {{\pythonstyle\lstinline!#1!}}                % inline python code
+
+\renewcommand{\arraystretch}{1.2}               % table vertical padding
+
+\renewcommand{\arraystretch}{1.2}               % table vertical padding
+
+\lstnewenvironment{pseudocode}[1][]             % pseudocode environment
+  {\lstset{
+    xleftmargin=\dimexpr.5cm+\parindent\relax,
+    gobble=6,
+    #1,
+    emph={
+      if, else, elif, and, or, not,
+      for, while, continue, break, return, yield, do, to,
+      true, false, null
+    },
+    emphstyle={\bfseries}
+  }}{}
+
+\setlist[enumerate, 1]                          % default level 1 list
+  {wide, label=\bfseries\arabic*., labelwidth=10pt, labelindent=0pt}
+\setlist[enumerate, 2]                          % default level 2 list
+  {wide, label=\bfseries(\alph*), topsep=0pt, labelwidth=10pt, labelindent=\leftskip, leftmargin=0pt}
+\setlist[enumerate, 3]                          % default level 2 list
+  {wide, label=\bfseries\roman*, topsep=0pt, labelwidth=10pt, labelindent=\leftskip, leftmargin=0pt}
+
+\newenvironment{enumerate*}[1][,]               % text enumerate
+  {\begin{enumerate}[
+    itemindent=\leftskip+\parindent, labelindent=\leftskip+\parindent, 
+    wide, topsep=0pt,
+    label={\bfseries\arabic*.}, labelwidth=10pt, labelindent=\leftskip+\parindent, 
+    leftmargin=\leftskip, rightmargin=\rightskip,
+    #1
+  ]}
+  {\end{enumerate}}
+
+\newenvironment{itemize*}[1][,]                 % text itemize
+  {\begin{itemize}[
+    itemindent=\leftskip+\parindent, labelindent=\leftskip+\parindent, 
+    wide, topsep=0pt,
+    label={\raisebox{-0.5mm}{\scalebox{1.5}{$\bullet$}}}, labelwidth=10pt, labelindent=\leftskip+\parindent, 
+    leftmargin=\leftskip, rightmargin=\rightskip,
+    #1
+  ]}
+  {\end{itemize}}
+% #endregion
+
+\begin{document}
+\begin{multicols*}{2}
+\setlength{\columnseprule}{0.4pt}
+
+\begin{center}
+  \textbf{\large MAC0444 --- Sistemas Baseados em Conhecimento}
+
+  \textit{Departamento de Ciência da Computação}
+
+  \bigskip
+  \triple{\textbf{Prof.ª} Renata Wassermann}{\textbf{Lista 1}}{4 de setembro de 2019}{\columnwidth}
+
+  \bigskip
+  {\bf Aluno} Vitor Santa Rosa Gomes, 10258862, vitorssrg@usp.br
+
+  {\bf Curso} Bacharelado em Ciência da Computação, IME-USP
+\end{center}
+
+\begin{enumerate}
+  \renewcommand{\b}{\overline}
+  \newcommand{\s}{\smash}
+  \newcommand{\lxor}{\mathbin{\,\underline{\!\vee\!}\,}}
+
+  \item[\textbf{1.}] Para cada uma das três sentenças abaixo, encontre uma interpretação que faça a 
+  sentença falsa e as outras duas verdadeiras:
+  \begin{proof*}[\unskip\nopunct]
+    \begin{enumerate}
+      \item $\forall x \forall y \forall z((P(x,\ y)\land P(y,\ z) \rightarrow P(x,\ z)))$
+      \item $\forall x \forall y((P(x,\ y)\land P(y,\ x) \rightarrow x=y))$
+      \item $\forall x \forall y((P(a,\ y)\rightarrow P(x,\ b)))$
+    \end{enumerate}
+    \begin{tabular}{c|ccc}
+        Interpretação $\mathfrak{I} \defeq \l\langle\mathcal{D},\ \mathcal{I}\r\rangle$
+      & \textbf{(a)}
+      & \textbf{(b)}
+      & \textbf{(c)}
+      \\ \hline
+
+        $\mathcal{D}$
+      & $\mathcal{D}\defeq\l\{1,\ 2,\ 3,\ 4\r\}$
+      & $\mathcal{D}\defeq\l\{1,\ 2,\ 3,\ 4\r\}$
+      & $\mathcal{D}\defeq\Reals$
+      \\
+
+        $\mathcal{I}(P)$
+      & $\l\{(1,\ 2),\ (2,\ 3)\r\}$
+      & $\l\{(1,\ 1),\ (1,\ 2),\ (2,\ 1)\r\}$
+      & $\leq$
+      \\
+
+        $\mathcal{I}(a)$
+      & $1$
+      & $1$
+      & $1$
+      \\
+
+        $\mathcal{I}(b)$
+      & $3$
+      & $3$
+      & $2$
+      \\
+
+        $\forall x, y, z\ ((P(x,\ y)\land P(y,\ z) \rightarrow P(x,\ z)))$
+      & $x=1,\ y=2,\ z=3$ \xmark
+      & \cmark
+      & transitividade \cmark
+      \\
+
+        $\forall x, y\ ((P(x,\ y)\land P(y,\ x) \rightarrow x=y))$
+      & \cmark
+      & $x=1,\ y=2$ \xmark
+      & antissimétrica \cmark
+      \\
+
+        $\forall x, y\ ((P(a,\ y)\rightarrow P(x,\ b)))$
+      & $y=4$ \cmark
+      & $y=4$ \cmark
+      & $y=1,\ x=3$ \xmark
+     \end{tabular}
+  \end{proof*}
+
+  \vfill\null\columnbreak
+  \item[\textbf{2.}] Tony, Mike e John pertencem ao Clube Alpino. Todo membro do Clube Alpino que 
+  não é esquiador é alpinista. Alpinistas não gostam de chuva e qualquer um que não goste de neve 
+  não é esquiador. Mike não gosta de nada que Tony gosta e gosta de tudo o que Tony não gosta. Tony 
+  gosta de chuva e de neve.
+  \begin{proof*}[\unskip\nopunct]
+    \begin{enumerate}
+      \item Represente o conhecimento sobre o Clube Alpino e seus membros.
+        
+        Constantes: $\mathcal{C} = \l\{\text{Tony},\ \text{Mike},\ \text{John},\ 
+        \text{chuva},\ \text{neve}\r\}$.
+
+        Predicados $\mathcal{P}$:
+        \begin{itemize*}
+          \item $\text{alpino}(x)$: $x$ é membro do clube Alpino;
+          \item $\text{esquiador}(x)$: $x$ é esquiador;
+          \item $\text{alpinista}(x)$: $x$ é alpinista;
+          \item $\text{gosta}(x,\ y)$: $x$ gosta de $y$.
+        \end{itemize*}
+        
+        Base de conhecimento:
+        \begin{align*}
+          & \text{As constantes são distintas entre si (conhecimento sobre o domínio)}              \tag{\textbf{0}}   \\
+          & \text{alpino}(\text{Tony})                                                              \tag{\textbf{1}}   \\
+          & \text{alpino}(\text{Mike})                                                              \tag{\textbf{2}}   \\
+          & \text{alpino}(\text{John})                                                              \tag{\textbf{3}}   \\
+          & \forall x(\text{alpino}(x)\rightarrow\text{esquiador}(x)\lor\text{alpinista}(x))        \tag{\textbf{4}}   \\
+          & \forall x(\text{alpinista}(x)\rightarrow\lnot\text{gosta}(x,\ \text{chuva}))            \tag{\textbf{5}}   \\
+          & \forall x(\lnot\text{gosta}(x,\ \text{neve})\rightarrow\lnot\text{esquiador}(x))        \tag{\textbf{6}}   \\
+          & \forall y(\text{gosta}(\text{Tony},\ y)\rightarrow\lnot\text{gosta}(\text{Mike},\ y))   \tag{\textbf{7}}   \\
+          & \forall y(\lnot\text{gosta}(\text{Tony},\ y)\rightarrow\text{gosta}(\text{Mike},\ y))   \tag{\textbf{8}}   \\
+          & \text{gosta}(\text{Tony},\ \text{chuva})                                                \tag{\textbf{9}}   \\
+          & \text{gosta}(\text{Tony},\ \text{neve})                                                 \tag{\textbf{10}}  \\
+        \end{align*}
+
+      \item Prove semanticamente que é uma consequência lógica deste conhecimento que existe um 
+      membro do Clube Alpino que é alpinista mas não esquiador.
+      
+        \begin{align*}
+          & \lnot\text{gosta}(\text{Mike},\ \text{neve})                                            \tag{$\textbf{7}\l[x\leftarrow\text{Mike}\r]\land\textbf{10}\vDash\textbf{11}$}                 \\
+          & \lnot\text{esquiador}(\text{Mike})                                                      \tag{$\textbf{6}\l[y\leftarrow\text{Mike}\r]\land\textbf{11}\vDash\textbf{12}$}                 \\
+          & \text{alpinista}(\text{Mike})                                                           \tag{$\textbf{2}\land\textbf{4}\l[x\leftarrow\text{Mike}\r]\land\textbf{12}\vDash\textbf{13}$}  \\
+        \end{align*}
+
+        Existe um membro que é alpinista mas não é esquiador: Mike.
+
+      \item Suponha que tenha sido dito apenas que Mike gosta de tudo o que Tony não gosta, mas não 
+      que Mike não gosta de nada que Tony gosta. Mostre que agora a prova acima não é mais possível 
+      (dê um contra-exemplo).
+
+        Considere a interpretação canônica $\mathfrak{I}\defeq
+        \l\langle\mathcal{D}\defeq\mathcal{C},\ \mathcal{I}\sim\mathcal{P}\r\rangle$, com 
+        $\mathcal{I}$ obedecendo \textbf{1}, \textbf{2}, \textbf{3}, \textbf{9} e \textbf{10} e 
+        mapeando $\mathcal{D}\defeq\mathcal{C}\mapsto\mathcal{C}$ de forma idêntica.
+
+        Acrescente que Tony, Mike e John sejam esquiadores e gostem de neve.
+
+        Assim, concluem-se \textbf{4}, \textbf{5}, \textbf{6}, \textbf{8} (contraexemplo).
+
+      \item Use resolução com extração de resposta para descobrir quem é o membro do Clube Alpino 
+      que é alpinista mas não esquiador.
+
+        Base de conhecimento com a pergunta:
+        \begin{align*}
+          & \text{As constantes são distintas entre si (conhecimento sobre o domínio)}              \tag{\textbf{0}}  \\
+          & \text{alpino}(\text{Tony})                                                              \tag{\textbf{1}}  \\
+          & \text{alpino}(\text{Mike})                                                              \tag{\textbf{2}}  \\
+          & \text{alpino}(\text{John})                                                              \tag{\textbf{3}}  \\
+          & \lnot\text{alpino}(x)\lor\text{esquiador}(x)\lor\text{alpinista}(x)                     \tag{\textbf{4}}  \\
+          & \lnot\text{alpinista}(x)\lor\lnot\text{gosta}(x,\ \text{chuva})                         \tag{\textbf{5}}  \\
+          & \text{gosta}(x,\ \text{neve})\lor\lnot\text{esquiador}(x)                               \tag{\textbf{6}}  \\
+          & \lnot\text{gosta}(\text{Tony},\ y)\lor\lnot\text{gosta}(\text{Mike},\ y)                \tag{\textbf{7}}  \\
+          & \text{gosta}(\text{Tony},\ y)\lor\text{gosta}(\text{Mike},\ y)                          \tag{\textbf{8}}  \\
+          & \text{gosta}(\text{Tony},\ \text{chuva})                                                \tag{\textbf{9}}  \\
+          & \text{gosta}(\text{Tony},\ \text{neve})                                                 \tag{\textbf{10}} \\
+          & \lnot\text{alpino}(x)\lor\lnot\text{alpinista}(x)
+            \lor\text{esquiador}(x)\lor\text{resposta}(x)                                           \tag{\textbf{11}} \\
+        \end{align*}
+
+        Resolução:
+        \begin{align*}
+          & \lnot\text{gosta}(\text{Mike},\ \text{neve})                                            \tag{$\textbf{7}\l[y\leftarrow\text{Mike}\r]\land\textbf{10}\vDash\textbf{11}$} \\
+          & \lnot\text{esquiador}(\text{Mike})                                                      \tag{$\textbf{6}\l[x\leftarrow\text{Mike}\r]\land\textbf{11}\vDash\textbf{12}$} \\
+          & \text{esquiador}(\text{Mike})\lor\text{alpinista}(\text{Mike})                          \tag{$\textbf{2}\land\textbf{4}\l[x\leftarrow\text{Mike}\r]\vDash\textbf{13}$}  \\
+          & \text{alpinista}(\text{Mike})                                                           \tag{$\textbf{12}\land\textbf{13}\vDash\textbf{14}$}                            \\
+          & \lnot\text{alpinista}(\text{Mike})\lor\text{esquiador}(\text{Mike})
+            \lor\text{resposta}(\text{Mike})                                                        \tag{$\textbf{3}\land\textbf{11}\l[x\leftarrow\text{Mike}\r]\vDash\textbf{15}$} \\
+          & \lnot\text{alpinista}(\text{Mike})\lor\text{resposta}(\text{Mike})                      \tag{$\textbf{12}\land\textbf{15}\vDash\textbf{16}$}                            \\
+          & \text{resposta}(\text{Mike})                                                            \tag{$\textbf{14}\land\textbf{15}\vDash\textbf{17}$}                            \\
+        \end{align*}
+    \end{enumerate}
+  \end{proof*}
+\end{enumerate}
+\end{multicols*}
+\end{document}
