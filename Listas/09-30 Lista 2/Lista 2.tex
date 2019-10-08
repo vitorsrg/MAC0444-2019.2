@@ -1,0 +1,874 @@
+% #region imports
+\documentclass[10pt, twoside]{article}          % document type
+\usepackage[brazil]{babel}                      % portuguese support
+\usepackage[utf8]{inputenc}                     % almost every symbol
+\usepackage[T1]{fontenc}                        % font support
+
+\PassOptionsToPackage{table}{xcolor}            % table colors
+
+\usepackage{amsmath}                            % math enhancements
+\usepackage{amssymb}                            % math symbols
+\usepackage{amsthm}                             % math proof
+\usepackage{bera}                               % mono font
+\usepackage{booktabs}                           % figure tables
+\usepackage{cancel}                             % math cancel
+\usepackage{color}                              % page and text color
+\usepackage{dsfont}                             % indicator function
+\usepackage{enumitem}                           % list settings
+\usepackage{etoolbox}                           % bordermatrix patch
+\usepackage{float}                              % figure here
+\usepackage{fourier}                            % more readable math
+\usepackage{gensymb}                            % math degree
+\usepackage{geometry}                           % page settings
+\usepackage{graphicx}                           % images
+\usepackage{helvet}                             % Arial font
+\usepackage{hyperref}                           % links
+\usepackage{listings}                           % code environment
+\usepackage{mathtools}                          % mathclap
+\usepackage{multicol}                           % page columns
+% \usepackage{newtxmath}                          % more readable math
+\usepackage{nicefrac}                           % nicefrac horizontal fraction
+\usepackage{pifont}                             % correct and wrong symbols
+\usepackage[fontsize=8pt]{scrextend}            % global font size
+\usepackage{tabto}                              % tabto positioning
+\usepackage{textcomp}                           % text leaf
+\usepackage{tikz}                               % graphics
+% \usepackage[table]{xcolor}                      % table colors (option clash)
+\usepackage{xcolor}                             % html colors
+% #endregion
+
+% #region settings
+
+\DeclareSymbolFont{AMSb}{U}{msb}{m}{n}
+\makeatletter
+\DeclareSymbolFontAlphabet{\math@bb}{AMSb}
+\AtBeginDocument{\protected\def\mathbb{\math@bb}} 
+\makeatother
+
+\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
+
+\DeclareMathAlphabet{\mathfrak}{U}{jkpmia}{m}{it}
+\SetMathAlphabet{\mathfrak}{bold}{U}{jkpmia}{bx}{it}
+
+
+\usetikzlibrary{arrows, positioning, shapes}    % state diagram
+
+\geometry{                                      % page settings
+  papersize={216mm,279mm}, % landscape,
+  top=1.525cm,  outer=1.125cm,  bottom=1.125cm, inner=1.225cm,
+  includefoot,  footskip=0.5cm
+}
+
+\geometry{papersize={210mm,297mm}}              % A4 paper
+
+% \pagecolor{black}                               % page background color
+% \color{white}                                   % text default color
+
+\renewcommand{\familydefault}{\sfdefault}       % Arial font
+
+\lstset{
+  literate=
+  {á}{{\'a}}1 {à}{{\à}}1 {ã}{{\~a}}1
+  {é}{{\'e}}1 {ê}{{\^e}}1
+  {í}{{\'i}}1
+  {ó}{{\'o}}1 {õ}{{\~o}}1
+  {ú}{{\'u}}1 {ü}{{\"u}}1
+  {ç}{{\c{c}}}1
+}                                               % accents in code
+
+% \delimitershortfall=-1pt                        % bigger wrapping brackets
+\delimitershortfall=1pt                         % average wrapping brackets
+\def\dis{\displaystyle}                         % big inline math
+
+\makeatletter
+
+  \def\resetMathstrut@{%                        % default \left and \right in math mode (1/2)
+    \setbox\z@\hbox{%
+      \mathchardef\@tempa\mathcode`\[\relax
+      \def\@tempb##1"##2##3{\the\textfont"##3\char"}%
+      \expandafter\@tempb\meaning\@tempa \relax
+    }%
+    \ht\Mathstrutbox@\ht\z@ \dp\Mathstrutbox@\dp\z@}
+  \mathchardef\@tempa\mathcode`\]\relax
+
+  \def\cantox@vector#1#2#3#4#5#6#7#8{%
+    \dimen@.5\p@
+    \setbox\z@\vbox{\boxmaxdepth.5\p@
+    \hbox{\kern-1.2\p@\kern#1\dimen@$#7{#8}\m@th$}}%
+    \ifx\canto@fil\hidewidth  \wd\z@\z@ \else \kern-#6\unitlength \fi
+    \ooalign{%
+      \canto@fil$\m@th \CancelColor
+      \vcenter{\hbox{\dimen@#6\unitlength \kern\dimen@
+        \multiply\dimen@#4\divide\dimen@#3 \vrule\@depth\dimen@\@width\z@
+        \vector(#3,-#4){#5}%
+      }}_{\raise-#2\dimen@\copy\z@\kern-\scriptspace}$%
+      \canto@fil \cr
+      \hfil \box\@tempboxa \kern\wd\z@ \hfil \cr}}
+  \def\bcancelto#1#2{\let\canto@vector\cantox@vector\cancelto{#1}{#2}}
+
+  \newlength{\normalparindent}
+  \AtBeginDocument{\setlength{\normalparindent}{\parindent}}
+\makeatother
+
+\let\oldphantom\vphantom
+\let\vphantom\relax
+\begingroup                                     % default \left and \right in math mode (1/2)
+  \catcode`(\active \xdef({\mathopen{}\left\string(\vphantom{1j}}
+  \catcode`)\active \xdef){\right\string)\mathclose{}}
+\endgroup
+\mathcode`(="8000 \mathcode`)="8000
+\let\vphantom\oldphantom
+
+\DeclareMathSymbol{*}{\mathbin}{symbols}{"01}   % default \cdot in math mode
+% #endregion
+
+% #region commands
+\newcommand*\diff{\mathop{}\!\mathrm{d}}        % differential d
+
+\DeclareMathOperator{\dom}{dom}                 % dom function
+\DeclareMathOperator{\img}{img}                 % img function
+\DeclareMathOperator{\mdc}{mdc}                 % mdc function
+\DeclareMathOperator{\adj}{adj}                 % adj function
+\DeclareMathOperator{\proj}{proj}               % projection function
+
+\newcommand{\Reals}{\mathds{R}}                 % Reals set
+\newcommand{\Ints}{\mathds{Z}}                  % Integers set
+\newcommand{\Nats}{\mathds{N}}                  % Naturals set
+\newcommand{\Rats}{\mathds{Q}}                  % Rationals set
+\newcommand{\Irats}{\mathds{I}}                 % Irrationals set
+\newcommand{\Primes}{\mathds{P}}                % Primes set
+\newcommand{\ind}{\mathds{1}}                   % indicator function
+
+\newcommand{\given}{\,\middle|\,}               % conditional probability
+
+\renewcommand{\complement}{\mathsf{c}}          % set complement
+
+\DeclareRobustCommand{\Omicron}{%
+  \text{\small\usefont{OMS}{cmsy}{m}{n}O}%
+}                                               % big omicron
+\DeclareRobustCommand{\omicron}{%
+  \text{\small\usefont{OMS}{cmsy}{m}{n}o}%
+}                                               % small omicron
+
+\newcommand{\bigO}{\Omicron}                    % big O
+\newcommand{\smallo}{\omicron}                  % small o
+
+\newcommand{\defeq}{\vcentcolon=}               % definition
+\newcommand{\eqdef}{=\vcentcolon}               % reverse definition
+
+\newcommand{\cmark}{\ding{51}}                  % correct symbol
+\newcommand{\xmark}{\ding{55}}                  % wrong symbol
+\newcommand{\cross}{\ding{61}}                  % amortized symbol
+
+\renewcommand{\deg}{\!\degree\:}                % math degree
+
+\renewcommand{\binom}[2]{\l({{#1}\atop#2}\r)}   % combinations
+
+\DeclareRobustCommand{\Chi}
+  {{\mathpalette\irchi\relax}}
+\newcommand{\irchi}[2]
+  {\raisebox{\depth}{$#1\chi$}}                 % uppercase chi
+
+\newcommand{\overtext}[2]
+  {\overset{\mathclap{\text{#1}}}{#2}}          % text over
+\newcommand{\undertext}[2]
+  {\underset{\mathclap{\text{#1}}}{#2}}         % text under
+\newcommand{\overmath}[2]
+  {\overset{\mathclap{#1}}{#2}}                 % math over
+\newcommand{\undermath}[2]
+  {\underset{\mathclap{#1}}{#2}}                % math under
+\newcommand{\canceltext}[2]
+  {\smash{\overtext{#1}{\cancel{#2}}}}          % text cancel
+
+\newcommand{\vghost}[1]{{%                      % artificial math size
+  \delimitershortfall=-1pt
+  \vphantom{
+    \begingroup
+    \lccode`m=`(\relax
+    \lowercase\expandafter{\romannumeral#1000}%
+    \lccode`m=`)\relax
+    \lowercase\expandafter{\romannumeral#1000}%
+    \endgroup
+  }
+}}
+
+\renewcommand{\l}{\mathopen{}\left}             % \left alias
+\renewcommand{\r}{\vphantom{1j}\right}          % \right alias
+% \newcommand{\ls}[1]
+%   {\mathopen{}\noexpand\begingroup\left#1}      % \left alias
+% \newcommand{\rs}[1]
+%   {\vphantom{1j}\endgroup\right#1}              % \right alias
+
+\let\oldtextleaf\textleaf
+\renewcommand{\textleaf}
+  {{\fontfamily{cmr}\selectfont \oldtextleaf}}  % textleaf
+
+\renewcommand{\qed}{\hfill$\blacksquare$}       % Black-filled qed
+
+\newcommand{\x}[1]{\discretionary{#1}{#1}{#1}}  % correct hyphenation
+\newcommand{\y}{\hspace{0pt}}                   % breackable non-space    
+
+\newcommand{\triple}[4]{%
+  \parbox{.333#4}{#1\hfill}%
+  \parbox{.333#4}{\hfil#2\hfil}%
+  \parbox{.333#4}{\hfill#3}%
+}                                               % triple align
+% #endregion
+
+% #region customizations
+\newenvironment{proof*}[1][proof*]              % better proof environment
+  {\proof[#1]\vspace{0.5em}\vspace*{-\baselineskip}
+  \hspace{\parindent}\leftskip=.5cm\rightskip=.5cm}
+  % {\vspace*{-0.5\baselineskip}\rightskip=0cm\endproof}
+  {\vspace*{-1.5\baselineskip}
+  
+  \rightskip=0cm\endproof}
+
+% \let\bbordermatrix\bordermatrix
+\patchcmd{\bordermatrix}{8.75}{4.75}{}{}
+\patchcmd{\bordermatrix}{\left(}{\left[}{}{}    % bordermatrix with angular brackets (left)
+\patchcmd{\bordermatrix}{\right)}{\right]}{}{}  % bordermatrix with angular brackets (right)
+\patchcmd{\bordermatrix}
+  {\begingroup}{\begingroup\openup1\jot}{}{}    % bordermatrix col height
+
+\hypersetup{
+  colorlinks,
+  linkcolor={red!50!black},
+  citecolor={blue!50!black},
+  urlcolor={blue!80!black}
+}
+
+\lstset{
+  basicstyle=\ttfamily,
+  escapeinside={(*@}{@*)},
+  mathescape=true,
+  extendedchars=true,
+  inputencoding=utf8
+}                                               % styles in listings
+
+\DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{8}     % for bold monofont
+\DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{8}      % for normal monfont
+
+% \definecolor{deepblue}{rgb}{0,0,0.5}
+\newcommand{\pythonstyle}{\lstset{              % python code style
+  xleftmargin=\dimexpr.5cm+\parindent\relax,
+  language=Python,
+  % basicstyle=\ttm,
+  otherkeywords={self},
+  % keywordstyle=\ttb\color{purple},
+  keywordstyle={\bfseries},
+  % emph={MyClass,__init__},
+  % emphstyle=\ttb\color{deepred},
+  % stringstyle=\color{deepgreen},
+  % frame=tb,
+  showstringspaces=false
+}}
+
+\lstnewenvironment{python}[1][]
+  {\pythonstyle\lstset{#1}}{}                   % python environment
+
+\newcommand\pythonexternal[2][]
+  {{\pythonstyle\lstinputlisting[#1]{#2}}}      % external python code
+
+\newcommand\pythoninline[1]
+  {{\pythonstyle\lstinline!#1!}}                % inline python code
+
+\renewcommand{\arraystretch}{1.2}               % table vertical padding
+
+\renewcommand{\arraystretch}{1.2}               % table vertical padding
+
+\lstnewenvironment{pseudocode}[1][]             % pseudocode environment
+  {\lstset{
+    xleftmargin=\dimexpr.5cm+\parindent\relax,
+    gobble=6,
+    #1,
+    emph={
+      if, else, elif, and, or, not,
+      for, while, continue, break, return, yield, do, to,
+      true, false, null
+    },
+    emphstyle={\bfseries}
+  }}{}
+
+\setlist[enumerate, 1]                          % default level 1 list
+  {wide, label=\bfseries\arabic*., labelwidth=10pt, labelindent=0pt}
+\setlist[enumerate, 2]                          % default level 2 list
+  {wide, label=\bfseries(\alph*), topsep=0pt, labelwidth=10pt, labelindent=\leftskip, leftmargin=0pt}
+\setlist[enumerate, 3]                          % default level 2 list
+  {wide, label=\bfseries\roman*, topsep=0pt, labelwidth=10pt, labelindent=\leftskip, leftmargin=0pt}
+
+\newenvironment{enumerate*}[1][,]               % text enumerate
+  {\begin{enumerate}[
+    itemindent=\leftskip+\parindent, labelindent=\leftskip+\parindent, 
+    wide, topsep=0pt,
+    label={\bfseries\arabic*.}, labelwidth=10pt, labelindent=\leftskip+\parindent, 
+    leftmargin=\leftskip, rightmargin=\rightskip,
+    #1
+  ]}
+  {\end{enumerate}}
+
+\newenvironment{itemize*}[1][,]                 % text itemize
+  {\begin{itemize}[
+    itemindent=\leftskip+\parindent, labelindent=\leftskip+\parindent, 
+    wide, topsep=0pt,
+    label={\raisebox{-0.5mm}{\scalebox{1.5}{$\bullet$}}}, labelwidth=10pt, labelindent=\leftskip+\parindent, 
+    leftmargin=\leftskip, rightmargin=\rightskip,
+    #1
+  ]}
+  {\end{itemize}}
+% #endregion
+
+\begin{document}
+\begin{multicols*}{2}
+\setlength{\columnseprule}{0.4pt}
+
+\begin{center}
+  \textbf{\large MAC0444 --- Sistemas Baseados em Conhecimento}
+
+  \textit{Departamento de Ciência da Computação}
+
+  \bigskip
+  \triple{\textbf{Prof.ª} Renata Wassermann}{\textbf{Lista 2}}{30 de setembro de 2019}{\columnwidth}
+
+  \bigskip
+  {\bf Aluno} Vitor Santa Rosa Gomes, 10258862, vitorssrg@usp.br
+
+  {\bf Curso} Bacharelado em Ciência da Computação, IME-USP
+\end{center}
+
+\begin{enumerate}
+  \renewcommand{\b}{\overline}
+  \newcommand{\s}{\smash}
+  \newcommand{\lxor}{\mathbin{\,\underline{\!\vee\!}\,}}
+
+  \item[\textbf{1.}] Formalize as seguintes sentenças usando os predicados unários \texttt{fezEx}, 
+  \texttt{vaiBem}, \texttt{mediaAlta} e o predicado binário \texttt{aprovado}:
+
+  ``Quem fez os exercícios vai bem na prova.''
+
+  ``Quem vai bem na prova fica com média alta.''
+
+  ``Quem fica com média alta é aprovado em mac444.''
+
+  ``João fez os exercícios.''
+
+  ``Maria foi bem na prova.''
+
+  Use \textbf{resolução SLD} para mostrar que João e Maria foram aprovados em mac444.
+  \begin{proof*}[\unskip\nopunct]
+    Formalização:
+    \begin{enumerate*}
+      \item $\forall x(\texttt{fezEx}(x)\rightarrow\texttt{vaiBem}(x))$
+      \item $\forall x(\texttt{vaiBem}(x)\rightarrow\texttt{mediaAlta}(x))$
+      \item $\forall x(\texttt{mediaAlta}(x)\rightarrow\texttt{aprovado}(x))$
+      \item $\texttt{fezEx}(\texttt{Joao})$
+      \item $\texttt{vaiBem}(\texttt{Maria})$
+    \end{enumerate*}
+
+    Em horn:
+    \begin{enumerate*}
+      \item $\l[\lnot\texttt{fezEx}(x),\ \texttt{vaiBem}(x) \vghost{2}\r]$
+      \item $\l[\lnot\texttt{vaiBem}(x),\ \texttt{mediaAlta}(x) \vghost{2}\r]$
+      \item $\l[\lnot\texttt{mediaAlta}(x),\ \texttt{aprovado}(x) \vghost{2}\r]$
+      \item $\l[\texttt{fezEx}(\texttt{Joao}) \vghost{2}\r]$
+      \item $\l[\texttt{vaiBem}(\texttt{Maria}) \vghost{2}\r]$
+    \end{enumerate*}
+
+    Adicionando a pergunta $\texttt{aprovado}(\texttt{Joao})\land\texttt{aprovado}(\texttt{Maria})$, 
+    usa-se resolução SLD com extração de resposta, para mostrar que tanto João quanto Maria foram 
+    aprovados.
+    \begin{center}
+      \vspace*{-10pt}
+      \begin{tikzpicture}[
+        auto, thick,
+        node/.style={draw, circle, thick, text centered, 
+                     minimum height=0.50cm, minimum width=0.50cm},
+        star/.style={draw, diamond, thick, text centered, 
+                     minimum height=0.50cm, minimum width=0.50cm},
+        block/.style={draw, thick, text centered, 
+                      minimum height=0.50cm, minimum width=0.50cm},
+        title/.style={draw=none, text centered, 
+                      minimum height=0.50cm, minimum width=0.50cm},
+        every loop/.style={}
+      ]
+
+        \node[title]  (x00)                                       {$\l[\lnot\texttt{aprovado}(\texttt{Joao}),\ \lnot\texttt{aprovado}(\texttt{Maria}) \vghost{2}\r]$};
+        \node[title]  (x01) [below=0.00 of x00, xshift= 3.00cm]   {$\l[\texttt{vaiBem}(\texttt{Maria}) \vghost{2}\r]$};
+        
+        \node[title]  (x10) [below=0.45 of x01, xshift=-3.00cm]   {$\l[\lnot\texttt{aprovado}(\texttt{Joao}),\ \lnot\texttt{aprovado}(\texttt{Maria}),\ \texttt{vaiBem}(\texttt{Maria}) \vghost{2}\r]$};
+        \node[title]  (x11) [below=0.00 of x10, xshift= 3.00cm]   {$\l[\lnot\texttt{vaiBem}(x),\ \texttt{mediaAlta}(x) \vghost{2}\r]$};
+
+        \node[title]  (x20) [below=0.45 of x11, xshift=-3.00cm]   {$\l[\lnot\texttt{aprovado}(\texttt{Joao}),\ \lnot\texttt{aprovado}(\texttt{Maria}),\ \texttt{mediaAlta}(\texttt{Maria}) \vghost{2}\r]$};
+        \node[title]  (x21) [below=0.00 of x20, xshift= 3.00cm]   {$\l[\lnot\texttt{mediaAlta}(x),\ \texttt{aprovado}(x) \vghost{2}\r]$};
+
+        \node[title]  (x30) [below=0.45 of x21, xshift=-3.00cm]   {$\l[\lnot\texttt{aprovado}(\texttt{Joao}) \vghost{2}\r]$};
+        \node[title]  (x31) [below=0.00 of x30, xshift= 3.00cm]   {$\l[\texttt{fezEx}(\texttt{Joao}) \vghost{2}\r]$};
+
+        \node[title]  (x40) [below=0.45 of x31, xshift=-3.00cm]   {$\l[\lnot\texttt{aprovado}(\texttt{Joao}),\ \texttt{fezEx}(\texttt{Joao}) \vghost{2}\r]$};
+        \node[title]  (x41) [below=0.00 of x40, xshift= 3.00cm]   {$\l[\lnot\texttt{fezEx}(x),\ \texttt{vaiBem}(x) \vghost{2}\r]$};
+
+        \node[title]  (x50) [below=0.45 of x41, xshift=-3.00cm]   {$\l[\lnot\texttt{aprovado}(\texttt{Joao}),\ \texttt{vaiBem}(\texttt{Joao}) \vghost{2}\r]$};
+        \node[title]  (x51) [below=0.00 of x50, xshift= 3.00cm]   {$\l[\lnot\texttt{vaiBem}(x),\ \texttt{mediaAlta}(x) \vghost{2}\r]$};
+
+        \node[title]  (x60) [below=0.45 of x51, xshift=-3.00cm]   {$\l[\lnot\texttt{aprovado}(\texttt{Joao}),\ \texttt{mediaAlta}(\texttt{Joao}) \vghost{2}\r]$};
+        \node[title]  (x61) [below=0.00 of x60, xshift= 3.00cm]   {$\l[\lnot\texttt{mediaAlta}(x),\ \texttt{aprovado}(x) \vghost{2}\r]$};
+
+        \node[title]  (x70) [below=0.45 of x61, xshift=-3.00cm]   {$\l[\ \cdot \ \vghost{2}\r]$};
+        
+        \path[->]
+          (x00) edge                                          (x10)
+          (x01) edge                                          (x10)
+
+          (x10) edge                                          (x20)
+          (x11) edge  node[below right] {$x/\texttt{Maria}$}  (x20)
+
+          (x20) edge                                          (x30)
+          (x21) edge  node[below right] {$x/\texttt{Maria}$}  (x30)
+
+          (x30) edge                                          (x40)
+          (x31) edge                                          (x40)
+
+          (x40) edge                                          (x50)
+          (x41) edge  node[below right] {$x/\texttt{Joao}$}   (x50)
+
+          (x50) edge                                          (x60)
+          (x51) edge  node[below right] {$x/\texttt{Joao}$}   (x60)
+
+          (x60) edge                                          (x70)
+          (x61) edge  node[below right] {$x/\texttt{Joao}$}   (x70)
+        ;
+      \end{tikzpicture}
+      \vspace*{-10pt}
+    \end{center}
+  \end{proof*}
+
+  \vfill\null\columnbreak
+  \item[\textbf{2.}] \ 
+  \vspace*{-30pt} 
+  \begin{proof*}[\unskip\nopunct]
+    \begin{enumerate}
+      \item Mostre passo a passo que o procedimento de \textbf{encadeamento para trás 
+      (\textit{backward chaining})} produz resposta SIM com objetivo $P(a)$ e uma base de 
+      conhecimento formada pelas seguintes cláusulas:
+      \begin{enumerate*}
+        \item $\l[\lnot A_1(x),\ \lnot A_2(x),\ P(x) \vghost{2}\r]$
+        \item $\l[\lnot B_1(x),\ \lnot B_2(x),\ A_1(x) \vghost{2}\r]$
+        \item $\l[\lnot B_3(x),\ \lnot B_4(x),\ A_2(x) \vghost{2}\r]$
+        \item $\l[B_1(a) \vghost{2}\r]$
+        \item $\l[B_2(a) \vghost{2}\r]$
+        \item $\l[B_3(a) \vghost{2}\r]$
+        \item $\l[B_4(a) \vghost{2}\r]$
+      \end{enumerate*}
+
+        É possível chegar na cláusula vazia em todos os ramos.
+        \begin{center}
+          \begin{tikzpicture}[
+            auto, thick,
+            node/.style={draw, circle, thick, text centered, 
+                         minimum height=0.50cm, minimum width=0.50cm},
+            star/.style={draw, diamond, thick, text centered, 
+                         minimum height=0.50cm, minimum width=0.50cm},
+            block/.style={draw, thick, text centered, 
+                          minimum height=0.50cm, minimum width=0.50cm},
+            title/.style={draw=none, text centered, 
+                          minimum height=0.50cm, minimum width=0.50cm},
+            every loop/.style={}
+          ]
+
+            \node[title]  (x00)                                       {$\l[\lnot P(a) \vghost{2}\r]$};
+              \node[title]  (x10) [below=0.50 of x00]                   {$\l[\lnot A_1(a),\ \lnot A_2(a),\ \cancel{P(a)} \vghost{2}\r]$};
+                \node[title]  (x20) [below=0.50 of x10, xshift=-2.00cm]   {$\l[\lnot B_1(a),\ \lnot B_2(a),\ \cancel{A_1(a)} \vghost{2}\r]$};
+                  \node[title]  (x30) [below=0.50 of x20, xshift=-1.00cm]   {$\l[\cancel{[B_1(a)} \vghost{2}\r]$};
+                  \node[title]  (x31) [below=0.50 of x20, xshift= 1.00cm]   {$\l[\cancel{[B_2(a)} \vghost{2}\r]$};
+                \node[title]  (x21) [below=0.50 of x10, xshift= 2.00cm]   {$\l[\lnot B_3(x),\ \lnot B_4(x),\ \cancel{A_2(x)} \vghost{2}\r]$};
+                  \node[title]  (x32) [below=0.50 of x21, xshift=-1.00cm]   {$\l[\cancel{[B_3(a)} \vghost{2}\r]$};
+                  \node[title]  (x33) [below=0.50 of x21, xshift= 1.00cm]   {$\l[\cancel{[B_4(a)} \vghost{2}\r]$};
+                      % \node[title]  (x51) [below=0.50 of x41                ]   {$\l[\ \cdot \ \vghost{2}\r]$};
+            
+            \path[->]
+              (x00) edge  node[left]        {$x/a$}   (x10)
+                (x10) edge  node[above left ] {$x/a$}   (x20)
+                  (x20) edge                              (x30)
+                  (x20) edge                              (x31)
+                (x10) edge  node[above right] {$x/a$}  (x21)
+                  (x21) edge                              (x32)
+                  (x21) edge                              (x33)
+                      % (x41) edge                              (x51)
+            ;
+          \end{tikzpicture}
+        \end{center}
+
+      \item Utilize \textbf{resolução SLD} para provar que $P(a)$ é consequência desta base de 
+      conhecimento.
+
+        Adicionando a negação da pergunta $P(a)$ à base, chegamos na cláusula vazia por 
+        resolução SLD, obtendo resposta positiva.
+        \begin{center}
+          \begin{tikzpicture}[
+            auto, thick,
+            node/.style={draw, circle, thick, text centered, 
+                         minimum height=0.50cm, minimum width=0.50cm},
+            star/.style={draw, diamond, thick, text centered, 
+                         minimum height=0.50cm, minimum width=0.50cm},
+            block/.style={draw, thick, text centered, 
+                          minimum height=0.50cm, minimum width=0.50cm},
+            title/.style={draw=none, text centered, 
+                          minimum height=0.50cm, minimum width=0.50cm},
+            every loop/.style={}
+          ]
+
+            \node[title]  (x00)                                       {$\l[\lnot P(a) \vghost{2}\r]$};
+            \node[title]  (x01) [                   xshift= 4.00cm]   {$\l[\lnot A_1(x),\ \lnot A_2(x),\ P(x) \vghost{2}\r]$};
+
+            \node[title]  (x10) [below=0.50 of x00                ]   {$\l[\lnot A_1(a),\ \lnot A_2(a) \vghost{2}\r]$};
+            \node[title]  (x11) [below=0.50 of x00, xshift= 4.00cm]   {$\l[\lnot B_1(x),\ \lnot B_2(x),\ A_1(x) \vghost{2}\r]$};
+
+            \node[title]  (x20) [below=0.50 of x10                ]   {$\l[\lnot A_2(a),\ \lnot B_1(a),\ \lnot B_2(a) \vghost{2}\r]$};
+            \node[title]  (x21) [below=0.50 of x10, xshift= 4.00cm]   {$\l[B_1(a) \vghost{2}\r]$};
+
+            \node[title]  (x30) [below=0.50 of x20                ]   {$\l[\lnot A_2(a),\ \lnot B_2(a) \vghost{2}\r]$};
+            \node[title]  (x31) [below=0.50 of x20, xshift= 4.00cm]   {$\l[B_2(a) \vghost{2}\r]$};
+
+            \node[title]  (x40) [below=0.50 of x30                ]   {$\l[\lnot A_2(a) \vghost{2}\r]$};
+            \node[title]  (x41) [below=0.50 of x30, xshift= 4.00cm]   {$\l[\lnot B_3(x),\ \lnot B_4(x),\ A_2(x) \vghost{2}\r]$};
+
+            \node[title]  (x50) [below=0.50 of x40                ]   {$\l[\lnot B_3(a),\ \lnot B_4(a) \vghost{2}\r]$};
+            \node[title]  (x51) [below=0.50 of x40, xshift= 4.00cm]   {$\l[B_3(a) \vghost{2}\r]$};
+
+            \node[title]  (x60) [below=0.50 of x50                ]   {$\l[\lnot B_4(a) \vghost{2}\r]$};
+            \node[title]  (x61) [below=0.50 of x50, xshift= 4.00cm]   {$\l[B_4(a) \vghost{2}\r]$};
+
+            \node[title]  (x70) [below=0.50 of x60                ]   {$\l[\ \cdot \ \vghost{2}\r]$};
+            
+            \path[->]
+              (x00) edge                              (x10)
+              (x01) edge  node[above left ] {$x/a$}   (x10)
+
+              (x10) edge                              (x20)
+              (x11) edge  node[above left ] {$x/a$}   (x20)
+
+              (x20) edge                              (x30)
+              (x21) edge                              (x30)
+
+              (x30) edge                              (x40)
+              (x31) edge                              (x40)
+
+              (x40) edge                              (x50)
+              (x41) edge  node[above left ] {$x/a$}   (x50)
+
+              (x50) edge                              (x60)
+              (x51) edge                              (x60)
+
+              (x60) edge                              (x70)
+              (x61) edge                              (x70)
+            ;
+          \end{tikzpicture}
+        \end{center}
+
+    \end{enumerate}
+  \end{proof*}
+
+  \vfill\null\columnbreak
+  \item[\textbf{3.}] Considere o seguinte programa em Prolog:
+  \begin{pseudocode}[gobble=4]
+    result([_, E | L], [E | M]) :- !, result(L, M).
+    result(_, []).
+  \end{pseudocode} 
+  \begin{proof*}[\unskip\nopunct]
+    \begin{enumerate}
+      \item Após ter carregado este programa, qual seria a resposta do Prolog para a seguinte 
+      consulta?
+        \begin{pseudocode}[gobble=8]
+          ?- result([a, b, c, d, e, f, g], X).
+        \end{pseudocode} 
+
+        Consulta na base:
+        \begin{pseudocode}[gobble=10]
+          ?- forall(result([a, b, c, d, e, f, g], X), 
+                    writef("%t\n", [X])),
+          [b,d,f]
+        \end{pseudocode}
+
+        Rastro da recursão:
+        \begin{pseudocode}[gobble=10]
+          result([a, b | [c,d,e,f,g]], [b | _5688])
+          result([c, d | [e,f,g]], [d | _5738])
+          result([e, f | [g]], [f | _5788])
+          result([g], [])
+        \end{pseudocode}
+
+      \item Descreva brevemente \textbf{o que} o programa faz e \textbf{como} ele o faz quando o 
+      primeiro argumento do predicado \texttt{result/2} é instanciado com uma lista e uma variável é 
+      passada no segundo argumento, assim como no item \textbf{(a)}. Suas explicações devem incluir 
+      respostas às seguintes perguntas:
+        \begin{enumerate*}
+          \item Qual(is) caso(s) é(são) coberto(s) pelo fato?
+          
+            O fato valida-se fazendo \texttt{X} conter os elementos em posição par da lista passada 
+            como primeiro argumento,
+
+          \item Qual efeito tem o corte na primeira linha do programa?
+          
+            O corte na segunda linha serve para forçar que a recursão de 
+            \texttt{result([\_, E | L], [E | M])} seja de calda com \texttt{result(\_, []).} como 
+            caso base. Isto é, o corte impede que, quando a primeira regra é válida, a segunda 
+            (que é sempre válida) também não seja. Sem ele, haveria muitas respostas:
+            \begin{pseudocode}[gobble=10]
+              ?- forall(result([a, b, c, d, e, f, g], X), 
+                        writef("%t\n", [X])),
+              [b,d,f]
+              [b,d]
+              [b]
+              []
+            \end{pseudocode}
+
+          \item Por que foi utilizada a variável anônima?
+          
+            Por que não temos interesse em seu valor; ele não é usado em outras partes do código.
+        \end{enumerate*}
+    \end{enumerate}
+  \end{proof*}
+
+  \item[\textbf{4.}] Suponha a seguinte base de conhecimento:
+  \begin{pseudocode}[gobble=4]
+    homem(americo).
+    homem(daniel).
+    homem(paulo).
+    homem(carlos).
+    homem(joaquim).
+    homem(filipe).
+
+    mulher(teresa).
+    mulher(sonia).
+    mulher(ana).
+    mulher(carla).
+    mulher(barbara).
+    mulher(maria).
+
+    idade(americo, 18).
+    idade(daniel, 60).
+    idade(paulo, 25).
+    idade(carlos, 37).
+    idade(joaquim, 80).
+    idade(felipe, 32).
+    idade(teresa, 18).
+    idade(sonia, 28).
+    idade(ana, 17).
+    idade(carla, 26).
+    idade(barbara, 51).
+    idade(maria , 79).
+
+    irmaos(americo, paulo).
+    irmaos(carlos, sonia).
+
+    pai(carlos, teresa).
+    pai(daniel, americo).
+    pai(daniel, paulo).
+    pai(joaquim, daniel).
+
+    mae(maria, daniel).
+    mae(barbara, ana).
+
+    casados(filipe, carla).
+    casados(americo, teresa).
+    casados(joaquim, maria).
+  \end{pseudocode} 
+  \begin{proof*}[\unskip\nopunct]
+    \begin{enumerate}
+      \item \texttt{avof(Mul, Pess)} em que \texttt{Mul} seja avó de \texttt{Pess}.
+
+        \begin{pseudocode}[gobble=10]
+          progenitor(A, B) :-
+              pai(A, B);
+              mae(A, B).
+      
+          avof(X, Y) :-
+              mae(X, Z),
+              progenitor(Z, Y).
+        \end{pseudocode}
+
+        Consulta na base:
+        \begin{pseudocode}[gobble=10]
+          ?- forall(avof(X, Y), writef("%t %t\n", [X, Y]))
+          maria americo
+          maria paulo
+        \end{pseudocode}
+
+      \item \texttt{avom(Hom, Pess)} em que \texttt{Hom} seja avô de \texttt{Pess}.
+
+        \begin{pseudocode}[gobble=10]
+          avom(X, Y) :-
+              pai(X, Z),
+              progenitor(Z, Y).
+        \end{pseudocode}
+
+        Consulta na base:
+        \begin{pseudocode}[gobble=10]
+          ?- forall(avom(X, Y), writef("%t %t\n", [X, Y]))
+          joaquim americo
+          joaquim paulo
+        \end{pseudocode}
+
+      \item \texttt{bisavom(Hom, Pess)} que é verdadeiro se Hom for bisavô de Pess.
+
+        \begin{pseudocode}[gobble=10]
+          bisavo(X, Y) :-
+              avom(X, Z),
+              progenitor(Z, Y).
+        \end{pseudocode}
+
+        Consulta na base:
+        \begin{pseudocode}[gobble=10]
+          ?- forall(bisavo(X, Y), writef("%t %t\n", [X, Y]))
+        \end{pseudocode}
+
+      \item \texttt{primo\_1(P1, P2)} que é verdadeiro se \texttt{P1} e \texttt{P2} forem primos em 
+      primeiro grau.
+
+        \begin{pseudocode}[gobble=10]
+          primo_1(A, B) :-
+              progenitor(C, A),
+              progenitor(D, B),
+              \+ progenitor(D, A),
+              \+ progenitor(C, B),
+              setof(E, (progenitor(E, C), progenitor(E, D)), _).
+        \end{pseudocode}
+
+        Consulta na base:
+        \begin{pseudocode}[gobble=10]
+          ?- forall(primo_1(X, Y), writef("%t %t\n", [X, Y]))
+        \end{pseudocode}
+
+      \item \texttt{primo(P1, P2)} que é verdadeiro se \texttt{P1} e \texttt{P2} forem primos em 
+      qualquer grau.
+
+        \begin{pseudocode}[gobble=10]
+          primo(A, B) :-
+              primo_1(A, B).
+          primo(A, B) :-
+              (progenitor(C, A), primo(C, B));
+              (progenitor(C, B), primo(A, C)).
+        \end{pseudocode}
+
+        Consulta na base:
+        \begin{pseudocode}[gobble=10]
+          ?- forall(primo(X, Y), writef("%t %t\n", [X, Y]))
+        \end{pseudocode}
+
+      \item \texttt{maior\_de\_idade(Pess)} que é verdadeiro se \texttt{Pess} for maior de idade. 
+
+        \begin{pseudocode}[gobble=10]
+          maior_de_idade(A) :-
+              age(A, B),
+              B >= 18.
+        \end{pseudocode}
+
+        Consulta na base:
+        \begin{pseudocode}[gobble=10]
+          ?- forall((maior_de_idade(X), idade(X, Y)), 
+                    writef("%t %t\n", [X, Y]))
+          americo 18
+          daniel 60
+          paulo 25
+          carlos 37
+          joaquim 80
+          filipe 32
+          teresa 18
+          sonia 28
+          carla 26
+          barbara 51
+          maria 79
+        \end{pseudocode}
+
+      \item \texttt{pessoas(Lista)} que devolve a \texttt{Lista} de todas as pessoas existentes na 
+      base de conhecimento.
+
+        \begin{pseudocode}[gobble=10]
+          pessoas(L) :-
+              setof(A, (homem(A); mulher(A)), L).
+        \end{pseudocode}
+
+        Consulta na base:
+        \begin{pseudocode}[gobble=10]
+          ?- forall(pessoas(L), writef("%t\n", [L]))
+          [americo,ana,barbara,carla,carlos,daniel,felipe,
+           joaquim,maria,paulo,sonia,teresa]
+        \end{pseudocode}
+
+      \item \texttt{mais\_velho(Pess)} que retorna a pessoa mais velha que consta na base de 
+      conhecimento.
+
+        \begin{pseudocode}[gobble=10]
+          mais_velho(A) :-
+              idade(A, B),
+              forall(idade(_, D), B >= D).
+        \end{pseudocode}
+
+        Consulta na base:
+        \begin{pseudocode}[gobble=10]
+          ?- forall((mais_velho(X), idade(X, Y)), 
+                    writef("%t %t\n", [X, Y]))
+          joaquim 80
+        \end{pseudocode}
+
+      \item \texttt{lista\_pessoas(Lista, Sexo)} que retorna uma \texttt{Lista} de todas as pessoas 
+      do \texttt{Sexo} indicado (\texttt{m}/\texttt{f}), incluindo as suas respectivas idades. Por 
+      exemplo, \texttt{lista\_pessoas(Lista, m)} deveria retornar:
+      \begin{pseudocode}[gobble=8]
+        Lista=[[americo, 18], [daniel, 60], [paulo, 25], 
+               [carlos, 37], [joaquim, 80], [filipe, 32]].
+      \end{pseudocode} 
+
+        \begin{pseudocode}[gobble=10]
+          lista_pessoas(L, m) :-
+              findall([A, B], (homem(A), idade(A, B)), L).
+          lista_pessoas(L, f) :-
+              findall([A, B], (mulher(A), idade(A, B)), L).
+        \end{pseudocode}
+
+        Consulta na base:
+        \begin{pseudocode}[gobble=10]
+          ?- forall(lista_pessoas(L, m), writef("%t\n", [L]))
+          [[americo,18],[daniel,60],[paulo,25],
+           [carlos,37],[joaquim,80],[filipe,32]]
+          ?- forall(lista_pessoas(L, f), writef("%t\n", [L]))
+          [[teresa,18],[sonia,28],[ana,17],
+           [carla,26],[barbara,51],[maria,79]]
+        \end{pseudocode}
+
+      \item \texttt{adequados(Hom, Mul)} que é verdadeiro se \texttt{Hom} for um homem, 
+      \texttt{Mul} for uma mulher e o homem for (no máximo) 2 anos mais novo do que a mulher ou 10 
+      anos mais velho do que ela e se ambos não tiverem nenhuma relação de parentesco nem nenhum 
+      deles for casado.
+
+        \begin{pseudocode}[gobble=10]
+          adequados(A, B) :-
+              homem(A),
+              mulher(B),
+              idade(A, C),
+              idade(B, D),
+              (C >= D - 2),
+              (D >= C - 10).
+        \end{pseudocode}
+
+        Consulta na base:
+        \begin{pseudocode}[gobble=10]
+          ?- forall(adequados(X, Y), writef("%t %t\n", [X, Y]))
+          americo teresa
+          americo ana
+          daniel barbara
+          paulo teresa
+          paulo ana
+          paulo carla
+          carlos sonia
+          joaquim maria
+          filipe sonia
+          filipe carla
+        \end{pseudocode}
+
+    \end{enumerate}
+  \end{proof*}
+
+\end{enumerate}
+\end{multicols*}
+\end{document}
