@@ -1,0 +1,606 @@
+% #region imports
+\documentclass[10pt, twoside]{article}          % document type
+\usepackage[brazil]{babel}                      % portuguese support
+\usepackage[utf8]{inputenc}                     % almost every symbol
+\usepackage[T1]{fontenc}                        % font support
+
+\PassOptionsToPackage{table}{xcolor}            % table colors
+
+\usepackage{amsmath}                            % math enhancements
+\usepackage{amssymb}                            % math symbols
+\usepackage{amsthm}                             % math proof
+\usepackage{bera}                               % mono font
+\usepackage{booktabs}                           % figure tables
+\usepackage{cancel}                             % math cancel
+\usepackage{color}                              % page and text color
+\usepackage{dsfont}                             % indicator function
+\usepackage{enumitem}                           % list settings
+\usepackage{etoolbox}                           % bordermatrix patch
+\usepackage{float}                              % figure here
+\usepackage{fourier}                            % more readable math
+\usepackage{gensymb}                            % math degree
+\usepackage{geometry}                           % page settings
+\usepackage{graphicx}                           % images
+\usepackage{helvet}                             % Arial font
+\usepackage{hyperref}                           % links
+\usepackage{listings}                           % code environment
+\usepackage{mathtools}                          % mathclap
+\usepackage{multicol}                           % page columns
+% \usepackage{newtxmath}                          % more readable math
+\usepackage{nicefrac}                           % nicefrac horizontal fraction
+\usepackage{pifont}                             % correct and wrong symbols
+\usepackage[fontsize=8pt]{scrextend}            % global font size
+\usepackage{tabto}                              % tabto positioning
+\usepackage{textcomp}                           % text leaf
+\usepackage{tikz}                               % graphics
+% \usepackage[table]{xcolor}                      % table colors (option clash)
+\usepackage{xcolor}                             % html colors
+% #endregion
+
+% #region settings
+
+\DeclareSymbolFont{AMSb}{U}{msb}{m}{n}
+\makeatletter
+\DeclareSymbolFontAlphabet{\math@bb}{AMSb}
+\AtBeginDocument{\protected\def\mathbb{\math@bb}} 
+\makeatother
+
+\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
+
+\DeclareMathAlphabet{\mathfrak}{U}{jkpmia}{m}{it}
+\SetMathAlphabet{\mathfrak}{bold}{U}{jkpmia}{bx}{it}
+
+
+\usetikzlibrary{arrows, positioning, shapes}    % state diagram
+
+\geometry{                                      % page settings
+  papersize={216mm,279mm}, landscape,
+  top=1.525cm,  outer=1.125cm,  bottom=1.125cm, inner=1.225cm,
+  includefoot,  footskip=0.5cm
+}
+
+\geometry{papersize={210mm,297mm}}              % A4 paper
+
+% \pagecolor{black}                               % page background color
+% \color{white}                                   % text default color
+
+\renewcommand{\familydefault}{\sfdefault}       % Arial font
+
+\lstset{
+  literate=
+  {á}{{\'a}}1 {à}{{\à}}1 {ã}{{\~a}}1
+  {é}{{\'e}}1 {ê}{{\^e}}1
+  {í}{{\'i}}1
+  {ó}{{\'o}}1 {õ}{{\~o}}1
+  {ú}{{\'u}}1 {ü}{{\"u}}1
+  {ç}{{\c{c}}}1
+}                                               % accents in code
+
+% \delimitershortfall=-1pt                        % bigger wrapping brackets
+\delimitershortfall=1pt                         % average wrapping brackets
+\def\dis{\displaystyle}                         % big inline math
+
+\makeatletter
+
+  \def\resetMathstrut@{%                        % default \left and \right in math mode (1/2)
+    \setbox\z@\hbox{%
+      \mathchardef\@tempa\mathcode`\[\relax
+      \def\@tempb##1"##2##3{\the\textfont"##3\char"}%
+      \expandafter\@tempb\meaning\@tempa \relax
+    }%
+    \ht\Mathstrutbox@\ht\z@ \dp\Mathstrutbox@\dp\z@}
+  \mathchardef\@tempa\mathcode`\]\relax
+
+  \def\cantox@vector#1#2#3#4#5#6#7#8{%
+    \dimen@.5\p@
+    \setbox\z@\vbox{\boxmaxdepth.5\p@
+    \hbox{\kern-1.2\p@\kern#1\dimen@$#7{#8}\m@th$}}%
+    \ifx\canto@fil\hidewidth  \wd\z@\z@ \else \kern-#6\unitlength \fi
+    \ooalign{%
+      \canto@fil$\m@th \CancelColor
+      \vcenter{\hbox{\dimen@#6\unitlength \kern\dimen@
+        \multiply\dimen@#4\divide\dimen@#3 \vrule\@depth\dimen@\@width\z@
+        \vector(#3,-#4){#5}%
+      }}_{\raise-#2\dimen@\copy\z@\kern-\scriptspace}$%
+      \canto@fil \cr
+      \hfil \box\@tempboxa \kern\wd\z@ \hfil \cr}}
+  \def\bcancelto#1#2{\let\canto@vector\cantox@vector\cancelto{#1}{#2}}
+
+  \newlength{\normalparindent}
+  \AtBeginDocument{\setlength{\normalparindent}{\parindent}}
+\makeatother
+
+\let\oldphantom\vphantom
+\let\vphantom\relax
+\begingroup                                     % default \left and \right in math mode (1/2)
+  \catcode`(\active \xdef({\mathopen{}\left\string(\vphantom{1j}}
+  \catcode`)\active \xdef){\right\string)\mathclose{}}
+\endgroup
+\mathcode`(="8000 \mathcode`)="8000
+\let\vphantom\oldphantom
+
+\DeclareMathSymbol{*}{\mathbin}{symbols}{"01}   % default \cdot in math mode
+% #endregion
+
+% #region commands
+\newcommand*\diff{\mathop{}\!\mathrm{d}}        % differential d
+
+\DeclareMathOperator{\dom}{dom}                 % dom function
+\DeclareMathOperator{\img}{img}                 % img function
+\DeclareMathOperator{\mdc}{mdc}                 % mdc function
+\DeclareMathOperator{\adj}{adj}                 % adj function
+\DeclareMathOperator{\proj}{proj}               % projection function
+
+\newcommand{\Reals}{\mathds{R}}                 % Reals set
+\newcommand{\Ints}{\mathds{Z}}                  % Integers set
+\newcommand{\Nats}{\mathds{N}}                  % Naturals set
+\newcommand{\Rats}{\mathds{Q}}                  % Rationals set
+\newcommand{\Irats}{\mathds{I}}                 % Irrationals set
+\newcommand{\Primes}{\mathds{P}}                % Primes set
+\newcommand{\ind}{\mathds{1}}                   % indicator function
+
+\newcommand{\given}{\,\middle|\,}               % conditional probability
+
+\renewcommand{\complement}{\mathsf{c}}          % set complement
+
+\DeclareRobustCommand{\Omicron}{%
+  \text{\small\usefont{OMS}{cmsy}{m}{n}O}%
+}                                               % big omicron
+\DeclareRobustCommand{\omicron}{%
+  \text{\small\usefont{OMS}{cmsy}{m}{n}o}%
+}                                               % small omicron
+
+\newcommand{\bigO}{\Omicron}                    % big O
+\newcommand{\smallo}{\omicron}                  % small o
+
+\newcommand{\defeq}{\vcentcolon=}               % definition
+\newcommand{\eqdef}{=\vcentcolon}               % reverse definition
+
+\newcommand{\cmark}{\ding{51}}                  % correct symbol
+\newcommand{\xmark}{\ding{55}}                  % wrong symbol
+\newcommand{\cross}{\ding{61}}                  % amortized symbol
+
+\renewcommand{\deg}{\!\degree\:}                % math degree
+
+\renewcommand{\binom}[2]{\l({{#1}\atop#2}\r)}   % combinations
+
+\DeclareRobustCommand{\Chi}
+  {{\mathpalette\irchi\relax}}
+\newcommand{\irchi}[2]
+  {\raisebox{\depth}{$#1\chi$}}                 % uppercase chi
+
+\newcommand{\overtext}[2]
+  {\overset{\mathclap{\text{#1}}}{#2}}          % text over
+\newcommand{\undertext}[2]
+  {\underset{\mathclap{\text{#1}}}{#2}}         % text under
+\newcommand{\overmath}[2]
+  {\overset{\mathclap{#1}}{#2}}                 % math over
+\newcommand{\undermath}[2]
+  {\underset{\mathclap{#1}}{#2}}                % math under
+\newcommand{\canceltext}[2]
+  {\smash{\overtext{#1}{\cancel{#2}}}}          % text cancel
+
+\newcommand{\vghost}[1]{{%                      % artificial math size
+  \delimitershortfall=-1pt
+  \vphantom{
+    \begingroup
+    \lccode`m=`(\relax
+    \lowercase\expandafter{\romannumeral#1000}%
+    \lccode`m=`)\relax
+    \lowercase\expandafter{\romannumeral#1000}%
+    \endgroup
+  }
+}}
+
+\renewcommand{\l}{\mathopen{}\left}             % \left alias
+\renewcommand{\r}{\vphantom{1j}\right}          % \right alias
+% \newcommand{\ls}[1]
+%   {\mathopen{}\noexpand\begingroup\left#1}      % \left alias
+% \newcommand{\rs}[1]
+%   {\vphantom{1j}\endgroup\right#1}              % \right alias
+
+\let\oldtextleaf\textleaf
+\renewcommand{\textleaf}
+  {{\fontfamily{cmr}\selectfont \oldtextleaf}}  % textleaf
+
+\renewcommand{\qed}{\hfill$\blacksquare$}       % Black-filled qed
+
+\newcommand{\x}[1]{\discretionary{#1}{#1}{#1}}  % correct hyphenation
+\newcommand{\y}{\hspace{0pt}}                   % breackable non-space    
+
+\newcommand{\triple}[4]{%
+  \parbox{.333#4}{#1\hfill}%
+  \parbox{.333#4}{\hfil#2\hfil}%
+  \parbox{.333#4}{\hfill#3}%
+}                                               % triple align
+% #endregion
+
+% #region customizations
+\newenvironment{proof*}[1][proof*]              % better proof environment
+  {\proof[#1]\vspace{0.5em}\vspace*{-\baselineskip}
+  \hspace{\parindent}\leftskip=.5cm\rightskip=.5cm}
+  % {\vspace*{-0.5\baselineskip}\rightskip=0cm\endproof}
+  {\vspace*{-1.5\baselineskip}
+  
+  \rightskip=0cm\endproof}
+
+% \let\bbordermatrix\bordermatrix
+\patchcmd{\bordermatrix}{8.75}{4.75}{}{}
+\patchcmd{\bordermatrix}{\left(}{\left[}{}{}    % bordermatrix with angular brackets (left)
+\patchcmd{\bordermatrix}{\right)}{\right]}{}{}  % bordermatrix with angular brackets (right)
+\patchcmd{\bordermatrix}
+  {\begingroup}{\begingroup\openup1\jot}{}{}    % bordermatrix col height
+
+\hypersetup{
+  colorlinks,
+  linkcolor={red!50!black},
+  citecolor={blue!50!black},
+  urlcolor={blue!80!black}
+}
+
+\lstset{
+  basicstyle=\ttfamily,
+  escapeinside={(*@}{@*)},
+  mathescape=true,
+  extendedchars=true,
+  inputencoding=utf8
+}                                               % styles in listings
+
+\DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{8}     % for bold monofont
+\DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{8}      % for normal monfont
+
+% \definecolor{deepblue}{rgb}{0,0,0.5}
+\newcommand{\pythonstyle}{\lstset{              % python code style
+  xleftmargin=\dimexpr.5cm+\parindent\relax,
+  language=Python,
+  % basicstyle=\ttm,
+  otherkeywords={self},
+  % keywordstyle=\ttb\color{purple},
+  keywordstyle={\bfseries},
+  % emph={MyClass,__init__},
+  % emphstyle=\ttb\color{deepred},
+  % stringstyle=\color{deepgreen},
+  % frame=tb,
+  showstringspaces=false
+}}
+
+\lstnewenvironment{python}[1][]
+  {\pythonstyle\lstset{#1}}{}                   % python environment
+
+\newcommand\pythonexternal[2][]
+  {{\pythonstyle\lstinputlisting[#1]{#2}}}      % external python code
+
+\newcommand\pythoninline[1]
+  {{\pythonstyle\lstinline!#1!}}                % inline python code
+
+\renewcommand{\arraystretch}{1.2}               % table vertical padding
+
+\renewcommand{\arraystretch}{1.2}               % table vertical padding
+
+\lstnewenvironment{pseudocode}[1][]             % pseudocode environment
+  {\lstset{
+    xleftmargin=\dimexpr.5cm+\parindent\relax,
+    gobble=6,
+    #1,
+    emph={
+      if, else, elif, and, or, not,
+      for, while, continue, break, return, yield, do, to,
+      true, false, null
+    },
+    emphstyle={\bfseries}
+  }}{}
+
+\setlist[enumerate, 1]                          % default level 1 list
+  {wide, label=\bfseries\arabic*., labelwidth=10pt, labelindent=0pt}
+\setlist[enumerate, 2]                          % default level 2 list
+  {wide, label=\bfseries(\alph*), topsep=0pt, labelwidth=10pt, labelindent=\leftskip, leftmargin=0pt}
+\setlist[enumerate, 3]                          % default level 2 list
+  {wide, label=\bfseries\roman*, topsep=0pt, labelwidth=10pt, labelindent=\leftskip, leftmargin=0pt}
+
+\newenvironment{enumerate*}[1][,]               % text enumerate
+  {\begin{enumerate}[
+    itemindent=\leftskip+\parindent, labelindent=\leftskip+\parindent, 
+    wide, topsep=0pt,
+    label={\bfseries\arabic*.}, labelwidth=10pt, labelindent=\leftskip+\parindent, 
+    leftmargin=\leftskip, rightmargin=\rightskip,
+    #1
+  ]}
+  {\end{enumerate}}
+
+\newenvironment{itemize*}[1][,]                 % text itemize
+  {\begin{itemize}[
+    itemindent=\leftskip+\parindent, labelindent=\leftskip+\parindent, 
+    wide, topsep=0pt,
+    label={\raisebox{-0.5mm}{\scalebox{1.5}{$\bullet$}}}, labelwidth=10pt, labelindent=\leftskip+\parindent, 
+    leftmargin=\leftskip, rightmargin=\rightskip,
+    #1
+  ]}
+  {\end{itemize}}
+% #endregion
+
+\begin{document}
+\begin{multicols*}{2}
+\setlength{\columnseprule}{0.4pt}
+
+\begin{center}
+  \textbf{\large MAC0444 --- Sistemas Baseados em Conhecimento}
+
+  \textit{Departamento de Ciência da Computação}
+
+  \bigskip
+  \triple{\textbf{Prof.ª} Renata Wassermann}{\textbf{Lista 3}}{16 de outubro de 2019}{\columnwidth}
+
+  \bigskip
+  {\bf Aluno} Vitor Santa Rosa Gomes, 10258862, vitorssrg@usp.br
+
+  {\bf Curso} Bacharelado em Ciência da Computação, IME-USP
+\end{center}
+
+\begin{enumerate}
+  \renewcommand{\b}{\overline}
+  \newcommand{\s}{\smash}
+  \newcommand{\lxor}{\mathbin{\,\underline{\!\vee\!}\,}}
+
+  \item[\textbf{1.}] João é cardiologista. Sua irmã, Marta, está desempregada. O pai deles dois, 
+  Pedro, é casado com Olívia, uma geriatra. Pedro é arqueologista e tem dois filhos no total.
+  \begin{proof*}[\unskip\nopunct]
+    \begin{enumerate}
+      \item Explique o que significa o conceito abaixo:
+      \[
+              \texttt{Human}
+        \sqcap\lnot\texttt{Female}
+        \sqcap(\exists \texttt{married}.\texttt{Doctor})
+        \sqcap(\forall \texttt{hasChild}.(\texttt{Doctor}\sqcup \texttt{Professor}))
+      \]
+      
+      em que os conceitos e papéis significam:
+      \begin{itemize*}
+        \item $\texttt{Human}$: é humano(a)
+        \item $\texttt{Female}$: é do sexo feminino
+        \item $\texttt{Doctor}$: é médico(a)
+        \item $\texttt{Professor}$: é professor(a)
+        \item $\texttt{hasChild}(x,\ y)$: $x$ tem $y$ como filho(a)
+        \item $\texttt{married}(x,\ y)$: $x$ é casado(a) com $y$
+      \end{itemize*}
+
+        O conceito é um humano que não é do sexo feminino, que é casado com algum médico, e cujos 
+        filhos são médicos ou professores.
+      
+      \item Considerando apenas as quatro pessoas mencionadas, João, Marta, Pedro e Olívia, podemos 
+      afirmar que algum deles pertence a esse conceito? Justifique.
+
+        Mesmo assumindo que todos sejam humanos, não é possível, já que
+        \begin{enumerate*}
+          \item João não é casado com alguém,
+          \item Marta não é casada com alguém,
+          \item Pedro tem como filha Marta, que é nem médica nem professora, e
+          \item Olívia não é casada com algum médico.
+        \end{enumerate*}
+
+      \item Se uma das 4 pessoas acima não existisse, sua resposta mudaria? Como e por quê?
+      
+        Sem Marta, Pedro pertenceria ao conceito:
+        \begin{enumerate*}
+          \item assume-se Pedro humano (razoável);
+          \item assume-se Pedro do sexo não feminino (razoável);
+          \item Pedro é casado com algum(a) médico(a), Olívia;
+          \item O(a) único(a) filho(a) de Pedro, João, é médico.
+        \end{enumerate*}
+    \end{enumerate}
+  \end{proof*}
+
+  \vfill\null\columnbreak
+  \item[\textbf{2.}] Considere a seguinte $\mathcal{T}$-Box $\mathcal{T}$:
+  \begin{align*}
+    \texttt{Mulher} &\sqsubseteq \texttt{Pessoa}       \\
+    \texttt{Homem}  &\sqsubseteq \texttt{Pessoa}       \\
+    \texttt{Homem}  &\sqsubseteq \lnot\texttt{Mulher}  \\
+    \texttt{Mulher} &\sqsubseteq \lnot\texttt{Homem}   \\
+  \end{align*} 
+
+  Verifique se o seguinte axioma é consequência lógica de $\mathcal{T}$. Dê uma demonstração 
+  semântica ou um contra-exemplo.
+  \[
+    \texttt{Pessoa} \sqcap \lnot\texttt{Homem} \equiv \texttt{Mulher}
+  \]
+  \begin{proof*}[\unskip\nopunct]
+    Não é consequência lógica: basta $x$ \texttt{Pessoa} ser nem \texttt{Mulher} nem \texttt{Homem}. 
+    contraexemplo:
+    \begin{align*}
+      \Delta^\mathcal{I}          &= \l\{x,\ y\r\}  \\
+      \texttt{Pessoa}^\mathcal{I} &= \l\{x,\ y\r\}  \\
+      \texttt{Mulher}^\mathcal{I} &= \l\{x\r\}      \\
+      \texttt{Homem}^\mathcal{I}  &= \l\{\r\}       \\
+    \end{align*}
+
+    Pois
+    \[
+                          \texttt{Pessoa} \sqcap \lnot\texttt{Homem} 
+                  \equiv  \l\{x,\ y\r\} 
+      \not\equiv 
+                          \l\{x\r\}
+                  \equiv  \texttt{Mulher}
+    \]
+  \end{proof*}
+
+  \item[\textbf{3.}] Traduza o seguinte axioma em uma sentença equivalente em lógica de primeira
+  ordem:
+  \[
+    \texttt{PaiDeMedicos}
+      \sqsubseteq 
+        \exists\texttt{temFilho}(\texttt{Homem} \sqcup \texttt{Mulher}) 
+        \sqcap\forall\texttt{temFilho}(\texttt{Medico})
+  \]
+  \begin{proof*}[\unskip\nopunct]
+    \delimitershortfall=-1pt
+    \begin{align*}
+      \underbrace{
+        \underbrace{\texttt{PaiDeMedicos}}_{\texttt{PaiDeMedicos}(x)}
+      \sqsubseteq 
+        \underbrace{
+          \underbrace{\exists
+            \underbrace{\texttt{temFilho}}_{\texttt{temFilho}(x,\ y)}(\vghost{1}\r.
+              \underbrace{
+                \underbrace{\texttt{Homem}}_{\texttt{Homem}(x)}
+              \sqcup 
+                \underbrace{\texttt{Mulher}}_{\texttt{Mulher}(x)}
+              }_{\texttt{Homem}(x)\lor\texttt{Mulher}(x)}
+            \l.\vghost{1}) 
+          }_{\exists y(\texttt{temFilho}(x,\ y)\land(\texttt{Homem}(y)\lor\texttt{Mulher}(y)))}
+        \sqcap
+          \underbrace{\forall
+            \underbrace{\texttt{temFilho}}_{\texttt{temFilho}(x,\ y)}(\vghost{1}\r.
+              \underbrace{\texttt{Medico}}_{\texttt{Medico}(x)}
+            \l.\vghost{1})
+          }_{\forall y(\texttt{temFilho}(x,\ y)\rightarrow\texttt{Medico}(y))}
+        }_{     \exists y(\texttt{temFilho}(x,\ y)\land(\texttt{Homem}(y)\lor\texttt{Mulher}(y)))
+           \land\forall y(\texttt{temFilho}(x,\ y)\rightarrow\texttt{Medico}(y))}
+      }_{\forall x(           \texttt{PaiDeMedicos}(x)
+                   \rightarrow     \exists y(\texttt{temFilho}(x,\ y)\land(\texttt{Homem}(y)\lor\texttt{Mulher}(y)))
+                              \land\forall y(\texttt{temFilho}(x,\ y)\rightarrow\texttt{Medico}(y)))}
+    \end{align*}
+  \end{proof*}
+
+  \vfill\null\columnbreak
+  \item[\textbf{4.}] Sejam os seguintes conceitos:
+  \begin{align*}
+    \texttt{Vegano}       &\equiv \texttt{Homem} \sqcap \forall\texttt{come}.\texttt{Planta}        \\
+    \texttt{Vegetariano}  &\equiv         (\texttt{Homem} \sqcup \texttt{Mulher}) 
+                                  \sqcap  \forall\texttt{come}.(       \texttt{Planta} 
+                                                                \sqcup \texttt{Laticinio})          \\
+  \end{align*} 
+
+  Mostre, \textbf{utilizando tableaux}, que $\texttt{Vegano}\sqsubseteq\texttt{Vegetariano}$.
+  \begin{proof*}[\unskip\nopunct]
+    \delimitershortfall=-1pt
+    Por ser um método de refutação, vamos mostrar que, de forma equivalente, 
+    $\lnot(\texttt{Vegano}\sqsubseteq\texttt{Vegetariano})$ é insatisfazível.
+
+    Em seguida, substituindo pelas definições dadas e propagando a negação:
+    \[
+              (
+                      \texttt{Homem}
+              \sqcap
+                      \forall\texttt{come}.\texttt{Planta}
+              )
+      \sqcap
+              (
+                      (\lnot\texttt{Homem}\sqcap\lnot\texttt{Mulher})
+              \sqcup
+                      \exists\texttt{come}.(\lnot\texttt{Planta}\sqcap\lnot\texttt{Laticinio})
+              )
+    \]
+
+    Aplicando o tableaux, vemos que $x\in\lnot(\texttt{Vegano}\sqsubseteq\texttt{Vegetariano})$ é 
+    uma contradição.
+    \begin{center}
+      \footnotesize
+      \begin{tikzpicture}[
+        auto, thick,
+        node/.style={draw, circle, thick, text centered, 
+                     minimum height=0.50cm, minimum width=0.50cm},
+        star/.style={draw, diamond, thick, text centered, 
+                     minimum height=0.50cm, minimum width=0.50cm},
+        block/.style={draw, thick, text centered, 
+                      minimum height=0.50cm, minimum width=0.50cm},
+        title/.style={draw=none, text centered, 
+                      minimum height=0.50cm, minimum width=0.50cm},
+        every loop/.style={}
+      ]
+
+        \node[title]  (x00) [                   xshift=-5.50cm]   {\textbf{1.}};
+        \node[title]  (x01)                                       {$((\texttt{Homem}\sqcap\forall\texttt{come}.\texttt{Planta})\sqcap((\lnot\texttt{Homem}\sqcap\lnot\texttt{Mulher})\sqcup\exists\texttt{come}.(\lnot\texttt{Planta}\sqcap\lnot\texttt{Laticinio})))(x)$};
+
+
+        \node[title]  (x10) [below=0.50 of x01, xshift=-5.50cm]   {\textbf{2.}};
+        \node[title]  (x11) [below=0.50 of x01                ]   {$(\texttt{Homem}\sqcap\forall\texttt{come}.\texttt{Planta})(x)$};
+        \node[title]  (x12) [below=0.50 of x01, xshift= 5.50cm]   {\textbf{1.}$\sqcap$};
+
+        \node[title]  (x20) [below=0.50 of x11, xshift=-5.50cm]   {\textbf{3.}};
+        \node[title]  (x21) [below=0.50 of x11                ]   {$((\lnot\texttt{Homem}\sqcap\lnot\texttt{Mulher})\sqcup\exists\texttt{come}.(\lnot\texttt{Planta}\sqcap\lnot\texttt{Laticinio}))(x)$};
+        \node[title]  (x22) [below=0.50 of x11, xshift= 5.50cm]   {\textbf{1.}$\sqcap$};
+
+        \node[title]  (x30) [below=0.50 of x21, xshift=-5.50cm]   {\textbf{4.}};
+        \node[title]  (x31) [below=0.50 of x21                ]   {$\texttt{Homem}(x)$};
+        \node[title]  (x32) [below=0.50 of x21, xshift= 5.50cm]   {\textbf{2.}$\sqcap$};
+
+        \node[title]  (x40) [below=0.50 of x31, xshift=-5.50cm]   {\textbf{5.}};
+        \node[title]  (x41) [below=0.50 of x31                ]   {$(\forall\texttt{come}.\texttt{Planta})(x)$};
+        \node[title]  (x42) [below=0.50 of x31, xshift= 5.50cm]   {\textbf{2.}$\sqcap$};
+
+        \node[title]  (x50) [below=0.50 of x41, xshift=-5.50cm]   {\textbf{6.}};
+        \node[title]  (x51) [below=0.50 of x41, xshift=-3.00cm]   {$((\lnot\texttt{Homem}\sqcap\lnot\texttt{Mulher}))(x)$};
+        \node[title]  (x52) [below=0.50 of x41, xshift=-0.50cm]   {\textbf{3.}$\sqcup$};
+
+        \node[title]  (x53) [below=0.50 of x41, xshift= 0.50cm]   {\textbf{7.}};
+        \node[title]  (x54) [below=0.50 of x41, xshift= 3.00cm]   {$(\exists\texttt{come}.(\lnot\texttt{Planta}\sqcap\lnot\texttt{Laticinio}))(x)$};
+        \node[title]  (x55) [below=0.50 of x41, xshift= 5.50cm]   {\textbf{3.}$\sqcup$};
+
+        \node[title]  (x60) [below=0.50 of x51, xshift=-2.50cm]   {\textbf{8.}};
+        \node[title]  (x61) [below=0.50 of x51                ]   {$\lnot\texttt{Homem}(x)$};
+        \node[title]  (x62) [below=0.50 of x51, xshift= 2.50cm]   {\textbf{3.}$\sqcap$};
+
+
+        \node[title]  (x71) [below=0.50 of x61                ]   {$\textbf{4.}\land\textbf{8.}\equiv\bot$};
+
+
+        \node[title]  (x63) [below=0.50 of x54, xshift=-2.50cm]   {\textbf{9.}};
+        \node[title]  (x64) [below=0.50 of x54                ]   {$\texttt{come}(x,\ y)$};
+        \node[title]  (x65) [below=0.50 of x54, xshift= 2.50cm]   {\textbf{7.}$\exists$};
+
+        \node[title]  (x73) [below=0.50 of x64, xshift=-2.50cm]   {\textbf{10.}};
+        \node[title]  (x74) [below=0.50 of x64                ]   {$(\lnot\texttt{Planta}\sqcap\lnot\texttt{Laticinio})(y)$};
+        \node[title]  (x75) [below=0.50 of x64, xshift= 2.50cm]   {\textbf{7.}$\exists$};
+
+        \node[title]  (x83) [below=0.50 of x74, xshift=-2.50cm]   {\textbf{11.}};
+        \node[title]  (x84) [below=0.50 of x74                ]   {$\texttt{Planta}(y)$};
+        \node[title]  (x85) [below=0.50 of x74, xshift= 2.50cm]   {$\textbf{5.}\land\textbf{9.}\forall$};
+
+        \node[title]  (x93) [below=0.50 of x84, xshift=-2.50cm]   {\textbf{12.}};
+        \node[title]  (x94) [below=0.50 of x84                ]   {$\lnot\texttt{Planta}(y)$};
+        \node[title]  (x95) [below=0.50 of x84, xshift= 2.50cm]   {\textbf{10.}$\sqcap$};
+
+
+        \node[title]  (xA4) [below=0.50 of x94                ]   {$\textbf{11.}\land\textbf{12.}\equiv\bot$};
+        
+
+        \path[->]
+          (x01) edge                              (x11)
+          (x11) edge                              (x21)
+          (x21) edge                              (x31)
+          (x31) edge                              (x41)
+            (x41) edge                              (x51)
+            (x51) edge                              (x61)
+            (x61) edge                              (x71)
+
+            (x41) edge                              (x54)
+            (x54) edge                              (x64)
+            (x64) edge                              (x74)
+            (x74) edge                              (x84)
+            (x84) edge                              (x94)
+            (x94) edge                              (xA4)
+        ;
+      \end{tikzpicture}
+    \end{center}
+  \end{proof*}
+
+\end{enumerate}
+
+\vfill\null
+\vfill\null
+{
+  \raggedleft
+  \tiny
+  \it
+
+  You held your head like a hero
+
+  On a history book page
+
+  It was the end of a decade
+
+  But the start of an age
+
+}
+\end{multicols*}
+\end{document}
